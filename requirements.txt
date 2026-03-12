@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+google-genai
+PyPDF2
+python-dotenv
+requests
+chromadb

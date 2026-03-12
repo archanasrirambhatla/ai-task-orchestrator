@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlanWise AI | Intelligent Strategic Planning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-khaki': {
+                            50: '#f6f3ee', 100: '#eee7dd', 200: '#ddd0bb', 300: '#ccb899', 400: '#bba177',
+                            500: '#aa8955', 600: '#886e44', 700: '#665233', 800: '#443722', 900: '#221b11', 950: '#18130c'
+                        },
+                        'pacific-blue': {
+                            50: '#ecf7f9', 100: '#d8f0f3', 200: '#b2e1e6', 300: '#8bd2da', 400: '#65c3cd',
+                            500: '#3eb4c1', 600: '#32909a', 700: '#256c74', 800: '#19484d', 900: '#0c2427', 950: '#09191b'
+                        },
+                        'aquamarine': { 500: '#2ad58b' }
+                    },
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f6f3ee;
+            background-image: radial-gradient(at 0% 0%, #ecf7f9 0, transparent 50%), radial-gradient(at 100% 100%, #f8ecf1 0, transparent 50%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .step-hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .option-label:has(input:checked) {
+            border-color: #3eb4c1;
+            background-color: #ecf7f9;
+        }
+
+        /* Markdown Styling in Chat */
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 { font-weight: bold; margin-top: 0.5rem; margin-bottom: 0.25rem; }
+        .markdown-content h1 { font-size: 1.25rem; }
+        .markdown-content h2 { font-size: 1.125rem; }
+        .markdown-content p { margin-bottom: 0.5rem; }
+        .markdown-content ul, .markdown-content ol { margin-left: 1.25rem; margin-bottom: 0.5rem; list-style-type: disc; }
+        .markdown-content ol { list-style-type: decimal; }
+        .markdown-content li { margin-bottom: 0.25rem; }
+        .markdown-content code { background: rgba(0,0,0,0.05); padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-family: monospace; }
+        .markdown-content pre { background: rgba(0,0,0,0.05); padding: 0.5rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.5rem; }
+        .markdown-content blockquote { border-left: 4px solid rgba(0,0,0,0.1); padding-left: 0.75rem; color: rgba(0,0,0,0.6); font-style: italic; }
+    </style>
+</head>
+
+<body class="min-h-screen py-12 px-6 text-dark-khaki-900 font-sans">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-bold text-dark-khaki-950 tracking-tight">PlanWise AI</h1>
+                <p class="text-dark-khaki-600 mt-1">Blueprint your success with AI-driven personalized planning.</p>
+            </div>
+            <div class="flex flex-col items-end">
+                <span id="currentPhaseLabel"
+                    class="text-sm font-bold text-pacific-blue-600 uppercase tracking-widest mb-2">Phase 1:
+                    Identity</span>
+                <div class="w-64 h-2 bg-dark-khaki-200 rounded-full overflow-hidden">
+                    <div id="progressBar" class="h-full bg-pacific-blue-500 progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <form id="onboardingForm" class="glass-card rounded-[2.5rem] p-8 md:p-14 shadow-2xl relative">
+
+            <!-- PHASE 1: RESUME & PERSONAL -->
+            <div id="phase1" class="phase-container">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-bold text-dark-khaki-950 mb-2">Professional Foundation</h2>
+                    <p class="text-dark-khaki-600">We'll use your resume to baseline your industry roles and expertise.
+                    </p>
+                </div>
+
+                <div class="space-y-8">
+                    <div class="relative group">
+                        <label class="block text-sm font-bold text-dark-khaki-700 mb-2 ml-1">Full Name</label>
+                        <input type="text" name="full_name" placeholder="John Doe"
+                            class="w-full px-6 py-4 rounded-2xl bg-white border border-dark-khaki-200 focus:ring-2 focus:ring-pacific-blue-200 focus:outline-none transition-all">
+                    </div>
+
+                    <div class="border-3 border-dashed border-dark-khaki-200 rounded-[2rem] p-12 text-center group hover:border-pacific-blue-400 hover:bg-pacific-blue-50/30 transition-all cursor-pointer relative overflow-hidden"
+                        onclick="document.getElementById('resume').click()">
+                        <input type="file" id="resume" name="resume" accept=".pdf" class="hidden"
+                            onchange="handleFile(this)">
+                        <div id="fileDisplay" class="space-y-4">
+                            <div
+                                class="inline-flex p-5 rounded-full bg-pacific-blue-100 text-pacific-blue-600 group-hover:scale-110 transition-transform">
+                                <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                        stroke-width="2" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xl font-bold text-dark-khaki-800">Upload Professional Resume</p>
+                                <p class="text-dark-khaki-500">PDF format preferred</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHASE 2: LIFE STRUCTURE -->
+            <div id="phase2" class="phase-container step-hidden">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-bold text-dark-khaki-950 mb-2">Life Structure</h2>
+                    <p class="text-dark-khaki-600">Mapping your marital status and primary responsibilities.</p>
+                </div>
+                <div class="space-y-10">
+                    <div>
+                        <p class="text-lg font-bold text-dark-khaki-800 mb-4">Which best describes your current life
+                            setup?</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label
+                                class="option-label border-2 border-dark-khaki-100 rounded-2xl p-5 cursor-pointer flex items-center space-x-4 transition-all hover:shadow-lg">
+                                <input type="radio" name="life_setup" value="Single"
+                                    class="w-5 h-5 accent-pacific-blue-500">
+                                <span class="font-medium">Single</span>
+                            </label>
+                            <label
+                                class="option-label border-2 border-dark-khaki-100 rounded-2xl p-5 cursor-pointer flex items-center space-x-4 transition-all hover:shadow-lg">
+                                <input type="radio" name="life_setup" value="Married or Partner"
+                                    class="w-5 h-5 accent-pacific-blue-500">
+                                <span class="font-medium">Married / Partner</span>
+                            </label>
+                            <label
+                                class="option-label border-2 border-dark-khaki-100 rounded-2xl p-5 cursor-pointer flex items-center space-x-4 transition-all hover:shadow-lg">
+                                <input type="radio" name="life_setup" value="Married or Partner with children"
+                                    class="w-5 h-5 accent-pacific-blue-500">
+                                <span class="font-medium">Partner with Children</span>
+                            </label>
+                            <label
+                                class="option-label border-2 border-dark-khaki-100 rounded-2xl p-5 cursor-pointer flex items-center space-x-4 transition-all hover:shadow-lg">
+                                <input type="radio" name="life_setup" value="Living with family"
+                                    class="w-5 h-5 accent-pacific-blue-500">
+                                <span class="font-medium">Living with Family</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-lg font-bold text-dark-khaki-800 mb-4">Which responsibilities take a significant
+                            amount of your time?</p>
+                        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                            <label
+                                class="flex items-center p-4 border rounded-xl hover:bg-dark-khaki-50 transition-colors cursor-pointer">
+                                <input type="checkbox" name="responsibilities" value="Childcare"
+                                    class="mr-3 w-4 h-4 accent-pacific-blue-500"> Childcare
+                            </label>
+                            <label
+                                class="flex items-center p-4 border rounded-xl hover:bg-dark-khaki-50 transition-colors cursor-pointer">
+                                <input type="checkbox" name="responsibilities" value="Household chores"
+                                    class="mr-3 w-4 h-4 accent-pacific-blue-500"> Chores
+                            </label>
+                            <label
+                                class="flex items-center p-4 border rounded-xl hover:bg-dark-khaki-50 transition-colors cursor-pointer">
+                                <input type="checkbox" name="responsibilities" value="Caring for parents"
+                                    class="mr-3 w-4 h-4 accent-pacific-blue-500"> Caregiving
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHASE 3: PRODUCTIVITY & STYLE -->
+            <div id="phase3" class="phase-container step-hidden">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-bold text-dark-khaki-950 mb-2">Work & Focus</h2>
+                    <p class="text-dark-khaki-600">Defining how you execute and when you're most effective.</p>
+                </div>
+                <div class="space-y-8">
+                    <div>
+                        <label class="block text-sm font-bold mb-3">Work Style</label>
+                        <select name="work_style"
+                            class="w-full px-5 py-4 rounded-xl bg-white border border-dark-khaki-200">
+                            <option value="Deep focused work">Deep focused work</option>
+                            <option value="Fast execution and iteration">Fast execution and iteration</option>
+                            <option value="Collaborative teamwork">Collaborative teamwork</option>
+                            <option value="Structured planning">Structured processes and planning</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-3">Peak Productivity</label>
+                        <div class="flex flex-wrap gap-3">
+                            <label
+                                class="px-6 py-3 border-2 rounded-full cursor-pointer hover:border-pacific-blue-400 has-[:checked]:bg-pacific-blue-500 has-[:checked]:text-white transition-all">
+                                <input type="radio" name="peak_productivity" value="Early morning" class="hidden"> Early
+                                Morning
+                            </label>
+                            <label
+                                class="px-6 py-3 border-2 rounded-full cursor-pointer hover:border-pacific-blue-400 has-[:checked]:bg-pacific-blue-500 has-[:checked]:text-white transition-all">
+                                <input type="radio" name="peak_productivity" value="Afternoon" class="hidden"> Afternoon
+                            </label>
+                            <label
+                                class="px-6 py-3 border-2 rounded-full cursor-pointer hover:border-pacific-blue-400 has-[:checked]:bg-pacific-blue-500 has-[:checked]:text-white transition-all">
+                                <input type="radio" name="peak_productivity" value="Late night" class="hidden"> Late
+                                Night
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHASE 4: PSYCHOLOGY & MOTIVATION -->
+            <div id="phase4" class="phase-container step-hidden">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-bold text-dark-khaki-950 mb-2">Psychology</h2>
+                    <p class="text-dark-khaki-600">Understanding your decision making and core motivations.</p>
+                </div>
+                <div class="space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-sm font-bold mb-3">Decision Style</label>
+                            <div class="space-y-3">
+                                <label
+                                    class="block p-4 bg-white border rounded-xl cursor-pointer hover:border-pacific-blue-300">
+                                    <input type="radio" name="decision_style" value="Data and analysis" class="mr-2">
+                                    Data & Analysis
+                                </label>
+                                <label
+                                    class="block p-4 bg-white border rounded-xl cursor-pointer hover:border-pacific-blue-300">
+                                    <input type="radio" name="decision_style" value="Intuition and experience"
+                                        class="mr-2"> Intuition / Gut
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-3">Approach to Risk</label>
+                            <select name="risk_preference"
+                                class="w-full px-5 py-4 rounded-xl bg-white border border-dark-khaki-200">
+                                <option value="Prefer safe">Safe and predictable</option>
+                                <option value="Balanced">Balanced / Calculated</option>
+                                <option value="High Risk">High Risk / Explorer</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHASE 5: GOALS & STRATEGY -->
+            <div id="phase5" class="phase-container step-hidden">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-bold text-dark-khaki-950 mb-2">Goals & Objectives</h2>
+                    <p class="text-dark-khaki-600">The targets PlanWise AI will help you achieve.</p>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Short Term Accomplishments (Next 1 year)</label>
+                        <textarea name="short_term_goals" rows="4"
+                            class="w-full px-6 py-4 rounded-2xl bg-white border border-dark-khaki-200 focus:ring-2 focus:ring-pacific-blue-200 focus:outline-none"
+                            placeholder="e.g. Launch a new product, run a marathon..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-4">What should your AI Assistant prioritize?</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label
+                                class="flex items-center p-4 border rounded-xl hover:bg-pacific-blue-50/50 cursor-pointer">
+                                <input type="checkbox" name="ai_help" value="Planning" class="mr-3"> Planning
+                            </label>
+                            <label
+                                class="flex items-center p-4 border rounded-xl hover:bg-pacific-blue-50/50 cursor-pointer">
+                                <input type="checkbox" name="ai_help" value="Decision Support" class="mr-3"> Decision
+                                Support
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NAVIGATION -->
+            <div class="mt-16 flex items-center justify-between">
+                <button type="button" id="prevBtn"
+                    class="px-10 py-4 rounded-2xl font-bold text-dark-khaki-600 hover:bg-dark-khaki-100 transition-all invisible">Back</button>
+                <button type="button" id="nextBtn"
+                    class="px-12 py-4 rounded-2xl bg-pacific-blue-500 text-white font-bold shadow-xl shadow-pacific-blue-100 hover:bg-pacific-blue-600 hover:-translate-y-1 transition-all flex items-center gap-2">
+                    <span id="btnText">Next Phase</span>
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </form>
+
+        <!-- ANALYZING OVERLAY -->
+        <div id="analyzingOverlay"
+            class="fixed inset-0 bg-dark-khaki-950/60 backdrop-blur-md hidden flex flex-col items-center justify-center z-[100] text-center px-6">
+            <div class="relative w-24 h-24 mb-8">
+                <div class="absolute inset-0 border-4 border-pacific-blue-200 rounded-full"></div>
+                <div
+                    class="absolute inset-0 border-4 border-pacific-blue-500 rounded-full border-t-transparent animate-spin">
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-white mb-4">PlanWise Engine is synthesizing...</h2>
+            <p class="text-pacific-blue-200 text-lg max-w-md">Optimizing your personalized planning blueprint via Gemini 3.1 Neural Processing.</p>
+        </div>
+
+        <div id="resultContainer" class="hidden mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div class="glass-card rounded-[2.5rem] p-10 overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center justify-between mb-10 gap-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-dark-khaki-950">PlanWise Blueprint Complete</h2>
+                        <p class="text-dark-khaki-600">Your personalized success strategy is ready.</p>
+                    </div>
+                    <div class="flex bg-dark-khaki-100 p-1.5 rounded-2xl">
+                        <button id="reportBtn" onclick="toggleView('report')"
+                            class="px-6 py-2.5 rounded-xl font-bold transition-all bg-pacific-blue-500 text-white shadow-lg">In-Depth Report</button>
+                        <button id="chatBtn" onclick="toggleView('chat')"
+                            class="px-6 py-2.5 rounded-xl font-bold transition-all text-dark-khaki-600 hover:text-dark-khaki-900">Consult PlanWise</button>
+                        <button id="jsonBtn" onclick="toggleView('json')"
+                            class="px-6 py-2.5 rounded-xl font-bold transition-all text-dark-khaki-600 hover:text-dark-khaki-900">Raw Schema</button>
+                    </div>
+                </div>
+
+                <!-- Deep Report View -->
+                <div id="reportView" class="animate-in fade-in duration-500">
+                    <div id="inDepthReport" class="markdown-content bg-white/50 rounded-3xl p-8 md:p-12 shadow-inner border border-white/40 overflow-auto max-h-[800px]">
+                        <!-- Content injected here -->
+                    </div>
+                </div>
+
+                <!-- Chat View (Initially Hidden) -->
+                <div id="chatView" class="hidden animate-in fade-in duration-500">
+                    <div class="bg-white/50 rounded-3xl p-6 shadow-inner border border-white/40 flex flex-col h-[600px]">
+                        <div id="chatHistory" class="flex-1 overflow-y-auto space-y-4 p-4 scroll-smooth">
+                            <div class="flex flex-col items-center justify-center h-full text-center text-dark-khaki-400">
+                                <div class="w-16 h-16 bg-pacific-blue-100 text-pacific-blue-500 rounded-full flex items-center justify-center mb-4">
+                                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                    </svg>
+                                </div>
+                                <p class="font-bold">Consult with PlanWise AI</p>
+                                <p class="text-sm">Your strategic planning assistant is ready. How can I help you today?</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <input type="text" id="chatInput" placeholder="Ask PlanWise anything..." 
+                                class="flex-1 px-6 py-4 rounded-2xl bg-white border border-dark-khaki-200 focus:ring-2 focus:ring-pacific-blue-200 focus:outline-none transition-all">
+                            <button onclick="sendMessage()" id="sendBtn" class="px-6 py-4 bg-pacific-blue-500 text-white rounded-2xl font-bold hover:bg-pacific-blue-600 transition-all flex items-center justify-center">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JSON View (Initially Hidden) -->
+                <div id="jsonView" class="hidden animate-in fade-in duration-500">
+                    <div class="flex justify-end mb-4">
+                        <button onclick="downloadSchema()" class="flex items-center gap-2 text-pacific-blue-600 font-bold hover:underline">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download JSON
+                        </button>
+                    </div>
+                    <div class="bg-dark-khaki-950 rounded-3xl p-8 text-aquamarine-400 font-mono text-sm overflow-auto max-h-[600px] shadow-inner border border-white/10">
+                        <pre id="jsonContent"></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <button onclick="window.location.reload()" class="text-dark-khaki-500 font-medium hover:text-dark-khaki-800 transition-colors underline underline-offset-4">Create Another Persona</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .markdown-content h1 { font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; margin-bottom: 1.5rem; color: #18130c; }
+        .markdown-content h2 { font-size: 1.5rem; line-height: 2rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; color: #443722; border-bottom: 1px solid #ddd0bb; padding-bottom: 0.5rem; }
+        .markdown-content h3 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #32909a; }
+        .markdown-content p { margin-bottom: 1rem; line-height: 1.625; color: #443722; }
+        .markdown-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .markdown-content li { margin-bottom: 0.25rem; }
+        .markdown-content table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; background: white; border-radius: 1rem; overflow: hidden; }
+        .markdown-content th { background-color: #f6f3ee; text-align: left; padding: 0.75rem; border: 1px solid #ddd0bb; font-weight: 700; }
+        .markdown-content td { padding: 0.75rem; border: 1px solid #ddd0bb; }
+        .markdown-content blockquote { border-left: 4px solid #3eb4c1; padding-left: 1rem; font-style: italic; color: #665233; margin-bottom: 1rem; }
+    </style>
+    <script>
+        let currentPhase = 1;
+        const totalPhases = 5;
+        const phaseLabels = [
+            "Phase 1: Foundation",
+            "Phase 2: Life Structure",
+            "Phase 3: Work & Style",
+            "Phase 4: Decision Logic",
+            "Phase 5: High-Level Objectives"
+        ];
+
+        function handleFile(input) {
+            const fileName = input.files[0] ? input.files[0].name : "Upload Professional Resume";
+            document.getElementById('fileDisplay').innerHTML = `
+                <div class="text-aquamarine-500 font-bold">✓ ${fileName} Selected</div>
+                <p class="text-dark-khaki-500 text-sm">Resume loaded for neural parsing</p>
+            `;
+        }
+
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+
+        nextBtn.onclick = () => {
+            if (currentPhase < totalPhases) {
+                document.getElementById(`phase${currentPhase}`).classList.add('step-hidden');
+                currentPhase++;
+                document.getElementById(`phase${currentPhase}`).classList.remove('step-hidden');
+                updateNav();
+            } else {
+                analyze();
+            }
+        };
+
+        prevBtn.onclick = () => {
+            if (currentPhase > 1) {
+                document.getElementById(`phase${currentPhase}`).classList.add('step-hidden');
+                currentPhase--;
+                document.getElementById(`phase${currentPhase}`).classList.remove('step-hidden');
+                updateNav();
+            }
+        };
+
+        function updateNav() {
+            document.getElementById('progressBar').style.width = `${((currentPhase - 1) / (totalPhases - 1)) * 100}%`;
+            document.getElementById('currentPhaseLabel').innerText = phaseLabels[currentPhase - 1];
+            prevBtn.classList.toggle('invisible', currentPhase === 1);
+            document.getElementById('btnText').innerText = currentPhase === totalPhases ? "Generate Strategy" : "Next Phase";
+        }
+        let personaSystemPrompt = "";
+        let currentBlueprintId = "";
+        let chatHistory = [];
+
+        async function analyze() {
+            const overlay = document.getElementById('analyzingOverlay');
+            const overlayHeading = overlay.querySelector('h2');
+            const overlayP = overlay.querySelector('p');
+            
+            overlay.classList.remove('hidden');
+            overlayHeading.innerText = "PlanWise Engine is synthesizing...";
+            overlayP.innerText = "Executing deep behavioral analysis via Local Qwen 2.5...";
+
+            const formData = new FormData(document.getElementById('onboardingForm'));
+            const answers = {};
+            formData.forEach((value, key) => {
+                if (answers[key]) {
+                    if (Array.isArray(answers[key])) answers[key].push(value);
+                    else answers[key] = [answers[key], value];
+                } else answers[key] = value;
+            });
+
+            const submitData = new FormData();
+            const resumeFile = document.getElementById('resume').files[0];
+            if (resumeFile) submitData.append('resume', resumeFile);
+            submitData.append('form_data', JSON.stringify(answers));
+
+            try {
+                // Unified Strategic Synthesis
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: submitData
+                });
+                const result = await response.json();
+
+                if (result.error) throw new Error(result.error);
+
+                // Store character and blueprint ID for chat
+                personaSystemPrompt = result.chat_system_prompt;
+                currentBlueprintId = result.blueprint_id;
+
+                overlay.classList.add('hidden');
+                document.getElementById('onboardingForm').classList.add('hidden');
+                document.getElementById('resultContainer').classList.remove('hidden');
+                
+                document.getElementById('jsonContent').innerText = JSON.stringify(result.raw_blueprint || result, null, 2);
+                
+                // Render the unified strategic report
+                const reportContainer = document.getElementById('inDepthReport');
+                let htmlContent = `
+                    <div class="mb-12">
+                        <h1 class="text-4xl font-bold text-dark-khaki-950 mb-4">PlanWise Strategic Blueprint</h1>
+                        <div class="bg-pacific-blue-50 border-l-4 border-pacific-blue-500 p-6 rounded-r-2xl">
+                            <h3 class="text-pacific-blue-800 font-bold mb-2 uppercase tracking-wider text-sm">Executive Summary</h3>
+                            <p class="text-dark-khaki-800 italic leading-relaxed">${result.executive_summary}</p>
+                        </div>
+                    </div>
+                `;
+
+                result.sections.forEach(section => {
+                    htmlContent += `
+                        <div class="mb-14 pb-10 border-b border-dark-khaki-100 last:border-0">
+                            <h2 class="text-3xl font-bold text-dark-khaki-900 mb-6 flex items-center gap-3">
+                                <span class="w-2 h-8 bg-pacific-blue-400 rounded-full"></span>
+                                ${section.title}
+                            </h2>
+                            
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                                <div class="space-y-6">
+                                    <div>
+                                        <h4 class="text-sm font-bold text-pacific-blue-600 uppercase mb-3">Narrative Analysis</h4>
+                                        <p class="text-dark-khaki-700 leading-relaxed">${section.narrative}</p>
+                                    </div>
+                                    
+                                    ${section.insights ? `
+                                        <div>
+                                            <h4 class="text-sm font-bold text-pacific-blue-600 uppercase mb-3">Strategic Insights</h4>
+                                            <ul class="space-y-2">
+                                                ${section.insights.map(insight => `
+                                                    <li class="flex items-start gap-3 text-dark-khaki-600">
+                                                        <span class="mt-1.5 w-1.5 h-1.5 bg-aquamarine-500 rounded-full flex-shrink-0"></span>
+                                                        ${insight}
+                                                    </li>
+                                                `).join('')}
+                                            </ul>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                
+                                <div>
+                                    <h4 class="text-sm font-bold text-pacific-blue-600 uppercase mb-4">Strategy Data Points</h4>
+                                    <div class="overflow-hidden rounded-2xl border border-dark-khaki-100 bg-white">
+                                        <table class="w-full text-sm">
+                                            <thead>
+                                                <tr class="bg-dark-khaki-50 border-b border-dark-khaki-100">
+                                                    <th class="px-4 py-3 text-left font-bold text-dark-khaki-800">Attribute</th>
+                                                    <th class="px-4 py-3 text-left font-bold text-dark-khaki-800">Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-dark-khaki-50">
+                                                ${Object.entries(section.structured_data || {}).map(([key, value]) => `
+                                                    <tr>
+                                                        <td class="px-4 py-3 font-medium text-dark-khaki-600 capitalize">${key.replace(/_/g, ' ')}</td>
+                                                        <td class="px-4 py-3 text-dark-khaki-900">${Array.isArray(value) ? value.join(', ') : (typeof value === 'object' ? JSON.stringify(value) : value)}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                reportContainer.innerHTML = htmlContent;
+                reportContainer.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error(error);
+                alert("Neural synthesis failed: " + error.message);
+                overlay.classList.add('hidden');
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            appendMessage('user', message);
+
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<div class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        system_prompt: personaSystemPrompt,
+                        blueprint_id: currentBlueprintId,
+                        history: chatHistory
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.reply) {
+                    appendMessage('planwise', data.reply);
+                    chatHistory.push({ role: 'user', content: message });
+                    chatHistory.push({ role: 'planwise', content: data.reply });
+                } else {
+                    throw new Error(data.error || "No reply from PlanWise");
+                }
+            } catch (error) {
+                appendMessage('system', "Connection lost: " + error.message);
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>';
+            }
+        }
+
+        function appendMessage(role, content) {
+            const history = document.getElementById('chatHistory');
+            const isUser = role === 'user';
+            const isPlanWise = role === 'planwise';
+            
+            // Remove empty state if present
+            if (history.querySelector('.text-center')) {
+                history.innerHTML = '';
+            }
+
+            const div = document.createElement('div');
+            div.className = `flex ${isUser ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`;
+            
+            // Parse content as Markdown if it's from the assistant
+            const formattedContent = isUser ? content : marked.parse(content);
+            
+            div.innerHTML = `
+                <div class="max-w-[85%] rounded-2xl px-5 py-3 ${isUser ? 'bg-pacific-blue-500 text-white rounded-tr-none' : 'bg-white border text-dark-khaki-800 rounded-tl-none shadow-sm'}">
+                    <div class="${isUser ? '' : 'markdown-content'}">
+                        ${formattedContent}
+                    </div>
+                </div>
+            `;
+            history.appendChild(div);
+            history.scrollTop = history.scrollHeight;
+        }
+
+        // Handle Enter key in chat input
+        document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function toggleView(view) {
+            const views = {
+                'report': document.getElementById('reportView'),
+                'json': document.getElementById('jsonView'),
+                'chat': document.getElementById('chatView')
+            };
+            const btns = {
+                'report': document.getElementById('reportBtn'),
+                'json': document.getElementById('jsonBtn'),
+                'chat': document.getElementById('chatBtn')
+            };
+
+            Object.keys(views).forEach(v => {
+                if (v === view) {
+                    views[v].classList.remove('hidden');
+                    btns[v].classList.add('bg-pacific-blue-500', 'text-white', 'shadow-lg');
+                    btns[v].classList.remove('text-dark-khaki-600');
+                } else {
+                    views[v].classList.add('hidden');
+                    btns[v].classList.remove('bg-pacific-blue-500', 'text-white', 'shadow-lg');
+                    btns[v].classList.add('text-dark-khaki-600');
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

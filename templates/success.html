@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success | Pulse AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-khaki': {
+                            50: '#f6f3ee', 100: '#eee7dd', 200: '#ddd0bb', 300: '#ccb899',
+                            400: '#bba177', 500: '#aa8955', 600: '#886e44', 700: '#665233',
+                            800: '#443722', 900: '#221b11', 950: '#18130c'
+                        },
+                        'pacific-blue': { 500: '#3eb4c1' },
+                        'aquamarine': { 500: '#2ad58b' }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f6f3ee;
+            background-image: radial-gradient(at 50% 50%, #eafbf3 0, transparent 80%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6 text-dark-khaki-900 font-sans">
+    <div class="max-w-md w-full glass-card rounded-3xl p-12 text-center shadow-2xl scale-in-center">
+        <div
+            class="inline-flex items-center justify-center p-4 bg-aquamarine-500 rounded-full shadow-lg shadow-aquamarine-100 mb-6 animate-bounce">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-bold text-dark-khaki-950 mb-4">You're All Set, {{ full_name }}!</h1>
+        <p class="text-dark-khaki-600 mb-8 leading-relaxed">
+            Your onboarding is complete. We've optimized your dashboard based on your goals.
+            Ready to dive in?
+        </p>
+
+        <a href="/"
+            class="inline-flex items-center space-x-2 text-pacific-blue-600 font-bold hover:text-pacific-blue-700 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Back to Home</span>
+        </a>
+    </div>
+</body>
+
+</html>
